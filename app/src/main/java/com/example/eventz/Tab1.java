@@ -1,162 +1,141 @@
 package com.example.eventz;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import java.util.ArrayList;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.squareup.picasso.Picasso;
 
-
+/*
+am folosit tutorialul asta https://www.youtube.com/watch?v=KOUyvCkwRss
+*/
 public class Tab1 extends Fragment {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    ImageButton btnI1, btnI2, btnI3, btnI4;
-    Button btn1, btn2, btn3, btn4;
+    Button addEventButton;
+    private static RecyclerView recyclerView;
+    DatabaseReference databaseReference;
+    FirebaseRecyclerOptions<Event> options;
+    FirebaseRecyclerAdapter<Event, EventViewHolder> adapter;
 
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
+   /*
+    private FirebaseDatabase mFirebaseDatabase;
+    ArrayList<Event> read_events; //lista de evenimente
+    */
 
     public Tab1() {
-    }
 
-    public static Tab1 newInstance(String param1, String param2) {
-        Tab1 fragment = new Tab1();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+        /* am folosit codul comentat pentru a adauga evenimente in baza de date
+         * in momentul asta sunt 12 evenimente in db
+         *  linia asta mFirebaseDatabase.getReference().child("event_list").setValue(null); sterge toate evenimentele existente
+         * functia addEventToDatabase genereaza un kei id nou pt eveniment si il insereaza apoi in db
+         */
+
+        /*read_events = new ArrayList<Event>();
+        Event event1 = new Event("Karaoke event", R.drawable.eveniment );
+        ArrayList<Event> arr = new ArrayList<Event>();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mFirebaseDatabase.getReference().child("event_list").setValue(null);
+        for(int i = 0; i < 12; i ++) {
+            addEventToDatabase(event1);
         }
+        readDatabase();*/
     }
 
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        final View view = inflater.inflate(R.layout.fragment_tab1, container, false);
-        btnI1 = (ImageButton) view.findViewById(R.id.imageEvent1);
-        btnI2 = (ImageButton) view.findViewById(R.id.imageEvent2);
-        btnI3 = (ImageButton) view.findViewById(R.id.imageEvent3);
-        btnI4 = (ImageButton) view.findViewById(R.id.imageEvent4);
-        btn1 = (Button) view.findViewById(R.id.btnEvent1);
-        btn2 = (Button) view.findViewById(R.id.btnEvent2);
-        btn3 = (Button) view.findViewById(R.id.btnEvent3);
-        btn4 = (Button) view.findViewById(R.id.btnEvent4);
-
-        btnI1.setOnClickListener(new View.OnClickListener(){
-
-            public void onClick(View v) {
-                Context this_activity = getActivity();
-                startActivity(new Intent(this_activity, Event1.class));
+        View view = inflater.inflate(R.layout.fragment_tab1, container, false);
+        recyclerView = (RecyclerView)view.findViewById(R.id.listView);
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("event_list");
+        options = new FirebaseRecyclerOptions.Builder<Event>().setQuery(databaseReference,Event.class).build();
+        adapter = new FirebaseRecyclerAdapter<Event, EventViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull EventViewHolder holder, final int position, @NonNull Event model) {
+                Picasso.get().load(model.getImageUrl()).into(holder.imageViewIcon);
+                holder.textViewName.setText(model.getName());
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        /* retinem id key-ul evenimentului pe care dam click*/
+                        String event_key = getRef(position).getKey();
+                        /* intram in pagina evenimentului*/
+                        Intent event_page = new Intent(getActivity(), EventPage.class);
+                        event_page.putExtra("event_key", event_key);
+                        startActivity(event_page);
+                    }
+                });
             }
-        });
 
-        btn1.setOnClickListener(new View.OnClickListener(){
-
-            public void onClick(View v) {
-                Context this_activity = getActivity();
-                startActivity(new Intent(this_activity, Event1.class));
+            @NonNull
+            @Override
+            public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_view_layout,parent,false);
+                return new EventViewHolder(view);
             }
-        });
 
-        btnI2.setOnClickListener(new View.OnClickListener(){
+        };
 
-            public void onClick(View v) {
-                Context this_activity = getActivity();
-                startActivity(new Intent(this_activity, Event2.class));
-            }
-        });
-        btn2.setOnClickListener(new View.OnClickListener(){
-
-            public void onClick(View v) {
-                Context this_activity = getActivity();
-                startActivity(new Intent(this_activity, Event2.class));
-            }
-        });
-
-        btnI3.setOnClickListener(new View.OnClickListener(){
-
-            public void onClick(View v) {
-                Context this_activity = getActivity();
-                startActivity(new Intent(this_activity, Event3.class));
-            }
-        });
-        btn3.setOnClickListener(new View.OnClickListener(){
-
-            public void onClick(View v) {
-                Context this_activity = getActivity();
-                startActivity(new Intent(this_activity, Event3.class));
-            }
-        });
-
-        btnI4.setOnClickListener(new View.OnClickListener(){
-
-            public void onClick(View v) {
-                Context this_activity = getActivity();
-                startActivity(new Intent(this_activity, Event4.class));
-            }
-        });
-
-        btn4.setOnClickListener(new View.OnClickListener(){
-
-            public void onClick(View v) {
-                Context this_activity = getActivity();
-                startActivity(new Intent(this_activity, Event4.class));
-            }
-        });
-
-
+        /*
+         *span count = nr. de evenimente pe coloana
+         */
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(view.getContext(),1);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        adapter.startListening();
+        recyclerView.setAdapter(adapter);
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-        }
-    }
+    /*
+     ADAUGARE EVENIMENT IN DATABASE
+    */
+   /* public void addEventToDatabase(Event newEvent) {
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("event_list");
+        //generam un key nou pt evenimentul de adaugat
+        String event_key = mDatabase.push().getKey();
+        //adaugam evenimentul
+        mDatabase.child(event_key).setValue(new Event("Event Musical", R.drawable.eveniment));
+    }*/
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
+   /* public void readDatabase() {
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("event_list");
+        mDatabase.addValueEventListener(new ValueEventListener() {
+           @Override
+           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+               ArrayList<Event> e = new ArrayList<Event>();
+               for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                   Event event= ds.getValue(Event.class);
+                   String event_idx = ds.getKey();
+                   System.out.println("event_idx = " + event_idx);
+                   System.out.println("event = " + event);
+                   e.add(event);
+               }
+               read_events = e;
+           }
+           @Override
+           public void onCancelled(@NonNull DatabaseError databaseError) {
 
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
+           }
+       });
+    }*/
 }
