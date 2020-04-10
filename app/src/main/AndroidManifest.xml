@@ -9,10 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Event4"></activity>
-        <activity android:name=".Event3" />
-        <activity android:name=".Event2" />
-        <activity android:name=".Event1" />
+        <activity android:name=".EventPage"></activity>
         <activity android:name=".HomePageActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".MainActivity">
