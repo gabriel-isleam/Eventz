@@ -9,9 +9,11 @@ import androidx.recyclerview.widget.RecyclerView;
 public class EventViewHolder extends RecyclerView.ViewHolder {
     TextView textViewName;
     ImageView imageViewIcon;
+    TextView textViewLocation;
 
     public EventViewHolder(View itemView) {
         super(itemView);
+        this.textViewLocation = (TextView) itemView.findViewById(R.id.location);
         this.textViewName = (TextView) itemView.findViewById(R.id.event_name);
         this.imageViewIcon = (ImageView) itemView.findViewById(R.id.event_img);
     }
