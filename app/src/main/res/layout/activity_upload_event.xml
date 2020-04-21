@@ -71,11 +71,19 @@
             android:layout_marginTop="20dp"
             android:gravity="center"
             android:hint="Enter Event Location Here" />
+        <EditText
+            android:id="@+id/TicketsEditText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/LocationEditText"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:hint="Enter Number of Tickets Here" />
         <Button
             android:id="@+id/ButtonUploadImage"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/LocationEditText"
+            android:layout_below="@+id/TicketsEditText"
             android:layout_marginTop="20dp"
             android:text="Upload Event" />
     </RelativeLayout>

@@ -35,7 +35,6 @@ am folosit tutorialul asta https://www.youtube.com/watch?v=KOUyvCkwRss
 */
 public class Tab1 extends Fragment {
 
-    Button addEventButton;
     private static RecyclerView recyclerView;
     DatabaseReference databaseReference;
     FirebaseRecyclerOptions<Event> options;
@@ -109,13 +108,6 @@ public class Tab1 extends Fragment {
         adapter.startListening();
         recyclerView.setAdapter(adapter);
 
-        addEventButton = view.findViewById(R.id.add_event);
-        addEventButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getActivity(), UploadEvent.class));
-            }
-        });
         return view;
     }
 

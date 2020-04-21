@@ -43,6 +43,7 @@ public class UploadEvent extends AppCompatActivity {
     EditText eventDescriptionEditText;
     EditText eventDateEditText;
     EditText eventLocationEditText;
+    EditText eventTicketsEditText;
     ImageView SelectImage;
 
     Uri FilePathUri;
@@ -64,6 +65,7 @@ public class UploadEvent extends AppCompatActivity {
         eventDescriptionEditText = (EditText)findViewById(R.id.DescriptionEditText);
         eventDateEditText = (EditText)findViewById(R.id.HourEditText);
         eventLocationEditText = (EditText)findViewById(R.id.LocationEditText);
+        eventTicketsEditText = (EditText) findViewById(R.id.TicketsEditText);
         SelectImage = (ImageView)findViewById(R.id.ShowImageView);
         progressDialog = new ProgressDialog(UploadEvent.this);
 
@@ -108,7 +110,7 @@ public class UploadEvent extends AppCompatActivity {
     public void UploadImageFileToFirebaseStorage() {
 
         if (FilePathUri != null) {
-            progressDialog.setTitle("Image is Uploading...");
+            progressDialog.setTitle("Event is Uploading...");
             progressDialog.show();
             final StorageReference storageRef2 = storageReference.child(Storage_Path + FilePathUri.getLastPathSegment());
             storageRef2.putFile(FilePathUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -130,12 +132,14 @@ public class UploadEvent extends AppCompatActivity {
                         String date = eventDateEditText.getText().toString().trim();
                         String location = eventLocationEditText.getText().toString().trim();
                         FirebaseUser user = mFirebaseAuth.getCurrentUser();
+                        String tickets_no = eventTicketsEditText.getText().toString().trim();
                         String userId = user.getUid();
+
                         /* poza s-a uploadat => oprim progressbar-ul*/
                         progressDialog.dismiss();
                         Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
                         @SuppressWarnings("VisibleForTests")
-                        Event eventInfo = new Event(eventName, downloadUri.toString(), description, date, location, userId);
+                        Event eventInfo = new Event(eventName, downloadUri.toString(), description, date, location, userId, tickets_no);
                         String eventId = databaseReference.push().getKey();
                         /* adaugare eveniment nou in baza de date*/
                         databaseReference.child(eventId).setValue(eventInfo);
