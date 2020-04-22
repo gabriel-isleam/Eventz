@@ -7,17 +7,19 @@ public class Event {
     private String date;
     private String userId;
     private String location;
+    private String tickets_no;
 
     public Event() {
 
     }
-    public Event(String name, String imageUrl, String description, String date, String location, String userID) {
+    public Event(String name, String imageUrl, String description, String date, String location, String userID, String tickets_no) {
         this.name = name;
         this.imageUrl = imageUrl;
         this.description = description;
         this.date = date;
         this.location = location;
         this.userId = userID;
+        this.tickets_no = tickets_no;
     }
 
     public String getImageUrl() {
@@ -66,5 +68,13 @@ public class Event {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getTickets_no() {
+        return tickets_no;
+    }
+
+    public void setTickets_no(String tickets_no) {
+        this.tickets_no = tickets_no;
     }
 }
