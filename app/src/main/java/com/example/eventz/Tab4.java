@@ -1,14 +1,11 @@
 package com.example.eventz;
 
+import androidx.fragment.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +20,8 @@ public class Tab4 extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     FirebaseAuth mFirebaseAuth;
-
     Button logoutButton; //BUTONUL DE LOGOUT
-
-    private String mParam1, mParam2;
-
-    private OnFragmentInteractionListener mListener;
+    TextView manage_profile;
 
     public Tab4() {
 
@@ -37,10 +30,6 @@ public class Tab4 extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
         mFirebaseAuth = FirebaseAuth.getInstance();
     }
 
@@ -73,32 +62,16 @@ public class Tab4 extends Fragment {
             }
         });
 
+        manage_profile = view.findViewById(R.id.manage_profile);
+        manage_profile.setOnClickListener(new View.OnClickListener(){
+
+            public void onClick(View v) {
+                Context this_activity = getActivity();
+                //redirectare catre pagina de settings
+                startActivity(new Intent(this_activity, Settings.class));
+            }
+        });
+
         return view;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 }
