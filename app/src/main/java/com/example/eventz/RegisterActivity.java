@@ -27,7 +27,7 @@ import com.google.firebase.auth.*;
 REGISTER PAGE
  */
 public class RegisterActivity extends AppCompatActivity {
-    EditText emailID, password, name;
+    EditText emailID, password;
     Button registerButton;
     TextView login;
     FirebaseAuth mFirebaseAuth;
@@ -50,7 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                 String email = emailID.getText().toString();
                 String pwd = password.getText().toString();
-                String username = name.getText().toString();
+
                 if(email.isEmpty()) {
                     emailID.setError("Please enter email");
                     emailID.requestFocus();
