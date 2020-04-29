@@ -79,11 +79,29 @@
             android:layout_marginTop="20dp"
             android:gravity="center"
             android:hint="Enter Number of Tickets Here" />
+
+        <EditText
+            android:id="@+id/StudentPriceEditText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/TicketsEditText"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:hint="Enter Price of Student Ticket Here" />
+
+        <EditText
+            android:id="@+id/AdultPriceEditText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/StudentPriceEditText"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:hint="Enter Price of Adult Ticket Here" />
         <Button
             android:id="@+id/ButtonUploadImage"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/TicketsEditText"
+            android:layout_below="@+id/AdultPriceEditText"
             android:layout_marginTop="20dp"
             android:text="Upload Event" />
     </RelativeLayout>

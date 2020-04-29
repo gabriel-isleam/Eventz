@@ -8,11 +8,13 @@ public class Event {
     private String userId;
     private String location;
     private String tickets_no;
+    private String student_price;
+    private String adult_price;
 
     public Event() {
 
     }
-    public Event(String name, String imageUrl, String description, String date, String location, String userID, String tickets_no) {
+    public Event(String name, String imageUrl, String description, String date, String location, String userID, String tickets_no, String student_price, String adult_price) {
         this.name = name;
         this.imageUrl = imageUrl;
         this.imageDescription = description;
@@ -20,6 +22,8 @@ public class Event {
         this.location = location;
         this.userId = userID;
         this.tickets_no = tickets_no;
+        this.student_price = student_price;
+        this.adult_price = adult_price;
     }
 
     public String getImageUrl() {
@@ -76,5 +80,21 @@ public class Event {
 
     public void setTickets_no(String tickets_no) {
         this.tickets_no = tickets_no;
+    }
+
+    public String getStudent_price() {
+        return student_price;
+    }
+
+    public void setStudent_price(String student_price) {
+        this.student_price = student_price;
+    }
+
+    public String getAdult_price() {
+        return adult_price;
+    }
+
+    public void setAdult_price(String adult_price) {
+        this.adult_price = adult_price;
     }
 }
