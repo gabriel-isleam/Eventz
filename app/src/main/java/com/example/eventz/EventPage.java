@@ -133,6 +133,7 @@ public class EventPage extends AppCompatActivity {
                     Date event_date = dateFormat.parse(EVENT_DATE_TIME);
                     Date current_date = new Date();
                     if (!current_date.after(event_date)) {
+
                         long diff = event_date.getTime() - current_date.getTime();
                         long Days = diff / (24 * 60 * 60 * 1000);
                         long Hours = diff / (60 * 60 * 1000) % 24;
