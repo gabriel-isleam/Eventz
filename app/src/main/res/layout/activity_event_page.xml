@@ -4,30 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".EventPage">
 
-    <ScrollView
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <ImageButton
-                android:id="@+id/heart"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="330dp"
-                android:layout_marginTop="300dp"
-                android:background="@color/white"
-                android:src="@drawable/heart"
-                android:tint="@color/white2"
-                app:layout_constraintDimensionRatio="1:1">
-
-            </ImageButton>
-        </LinearLayout>
-
-    </ScrollView>
+        android:scrollbars="vertical" />
 </androidx.constraintlayout.widget.ConstraintLayout>
