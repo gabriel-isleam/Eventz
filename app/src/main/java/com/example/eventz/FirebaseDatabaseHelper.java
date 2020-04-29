@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,44 +36,45 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/* primim din Tab1 event-id-ul evenimentului pe care am apasat*/
-//        eventId = getIntent().getExtras().get("event_key").toString();
-//        eventImage = getIntent().getExtras().get("event_image").toString();
-//        eventDescription = getIntent().getExtras().get("event_description").toString();
-
-public class EventPage extends AppCompatActivity {
+public class FirebaseDatabaseHelper {
     ImageButton heart;
     int check = 0;
     private String eventId;
-    Event event;
-    private RecyclerView mRecyclerView;
+    private String eventImage;
+    private String eventDescription;
+    TextView mDescription;
+    FirebaseDatabase mDatabase;
+    private DatabaseReference mReference;
+    private List<Event> events = new ArrayList<>();
+    ArrayAdapter<Event> mAdapter;
+    public interface DataStatus {
+        void DataIsLoaded(List<Event> events, List<String> keys);
+        void DataIsInserted();
+        void DataIsUpdated();
+        void DataIsDeleted();
+    }
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event_page);
-        eventId = getIntent().getExtras().get("event_key").toString();
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler);
-        new FirebaseDatabaseHelper().readEvents(new FirebaseDatabaseHelper.DataStatus() {
+    public FirebaseDatabaseHelper() {
+        mDatabase = FirebaseDatabase.getInstance();
+        mReference = mDatabase.getReference("event_list");
+    }
+
+    public void readEvents(final DataStatus dataStatus) {
+        mReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void DataIsLoaded(List<Event> events, List<String> keys) {
-                new RecyclerView_Config().setConfig(mRecyclerView, EventPage.this,
-                        events, keys, eventId);
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                events.clear();
+                List<String> keys = new ArrayList<>();
+                for (DataSnapshot keyNode : dataSnapshot.getChildren()) {
+                    keys.add(keyNode.getKey());
+                    Event ev = keyNode.getValue(Event.class);
+                    events.add(ev);
+                }
+                dataStatus.DataIsLoaded(events, keys);
             }
 
             @Override
-            public void DataIsInserted() {
-
-            }
-
-            @Override
-            public void DataIsUpdated() {
-
-            }
-
-            @Override
-            public void DataIsDeleted() {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
