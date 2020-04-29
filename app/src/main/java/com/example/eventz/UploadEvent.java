@@ -44,6 +44,8 @@ public class UploadEvent extends AppCompatActivity {
     EditText eventDateEditText;
     EditText eventLocationEditText;
     EditText eventTicketsEditText;
+    EditText eventStudentPriceEditText;
+    EditText eventAdultPriceEditText;
     ImageView SelectImage;
 
     Uri FilePathUri;
@@ -66,7 +68,10 @@ public class UploadEvent extends AppCompatActivity {
         eventDateEditText = (EditText)findViewById(R.id.HourEditText);
         eventLocationEditText = (EditText)findViewById(R.id.LocationEditText);
         eventTicketsEditText = (EditText) findViewById(R.id.TicketsEditText);
+        eventAdultPriceEditText = (EditText)findViewById(R.id.AdultPriceEditText);
+        eventStudentPriceEditText = (EditText)findViewById(R.id.StudentPriceEditText);
         SelectImage = (ImageView)findViewById(R.id.ShowImageView);
+
         progressDialog = new ProgressDialog(UploadEvent.this);
 
         // Adaugare Click listener pt. Choose image button
@@ -133,13 +138,16 @@ public class UploadEvent extends AppCompatActivity {
                         String location = eventLocationEditText.getText().toString().trim();
                         FirebaseUser user = mFirebaseAuth.getCurrentUser();
                         String tickets_no = eventTicketsEditText.getText().toString().trim();
+                        String student_price = eventStudentPriceEditText.getText().toString().trim();
+                        String adult_price = eventAdultPriceEditText.getText().toString().trim();
+
                         String userId = user.getUid();
 
                         /* poza s-a uploadat => oprim progressbar-ul*/
                         progressDialog.dismiss();
                         Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
                         @SuppressWarnings("VisibleForTests")
-                        Event eventInfo = new Event(eventName, downloadUri.toString(), description, date, location, userId, tickets_no);
+                        Event eventInfo = new Event(eventName, downloadUri.toString(), description, date, location, userId, tickets_no, student_price, adult_price);
                         String eventId = databaseReference.push().getKey();
                         /* adaugare eveniment nou in baza de date*/
                         databaseReference.child(eventId).setValue(eventInfo);
