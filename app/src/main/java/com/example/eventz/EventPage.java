@@ -55,7 +55,7 @@ public class EventPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_page);
         eventId = getIntent().getExtras().get("event_key").toString();
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler);
+        mRecyclerView = findViewById(R.id.recycler);
         new FirebaseDatabaseHelper().readEvents(new FirebaseDatabaseHelper.DataStatus() {
             @Override
             public void DataIsLoaded(List<Event> events, List<String> keys) {
