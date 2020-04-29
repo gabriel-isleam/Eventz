@@ -3,7 +3,7 @@ package com.example.eventz;
 public class Event {
     private String name;
     private String imageUrl;
-    private String description;
+    private String imageDescription;
     private String date;
     private String userId;
     private String location;
@@ -15,7 +15,7 @@ public class Event {
     public Event(String name, String imageUrl, String description, String date, String location, String userID, String tickets_no) {
         this.name = name;
         this.imageUrl = imageUrl;
-        this.description = description;
+        this.imageDescription = description;
         this.date = date;
         this.location = location;
         this.userId = userID;
@@ -39,11 +39,11 @@ public class Event {
     }
 
     public String getImageDescription() {
-        return description;
+        return imageDescription;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setImageDescription(String description) {
+        this.imageDescription = description;
     }
 
     public String getDate() {
