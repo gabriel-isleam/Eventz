@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -47,6 +48,7 @@ public class Tab2 extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private FirebaseRecyclerOptions<Event> options;
     private FirebaseRecyclerAdapter<Event, EventViewHolder> adapter;
+    boolean dataAvailable = false;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -89,56 +91,88 @@ public class Tab2 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_tab, container, false);
-        RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.listView);
+        final RecyclerView recyclerView = view.findViewById(R.id.listView);
+        final TextView empty_view = view.findViewById(R.id.empty_view);
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(userUid).child("favourites");
-        options = new FirebaseRecyclerOptions.Builder<Event>().setQuery(databaseReference,Event.class).build();
-        adapter = new FirebaseRecyclerAdapter<Event, EventViewHolder>(options) {
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
-            protected void onBindViewHolder(@NonNull EventViewHolder holder, final int position, @NonNull Event model) {
-                //Picasso.get().load(model.getImageUrl()).into(holder.imageViewIcon);
-                final String eventName = model.getName();
-                final Event event = model;
-                Glide.with(view.getContext()).load(model.getImageUrl()).override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).into(holder.imageViewIcon);
-                holder.textViewName.setText(model.getName());
-                holder.textViewLocation.setText(model.getLocation());
-                holder.imageViewIcon.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        /* retinem id key-ul evenimentului pe care dam click*/
-                        String event_key = getRef(position).getKey();
-                        /* intram in pagina evenimentului*/
-                        Intent event_page = new Intent(getActivity(), EventPage.class);
-                        event_page.putExtra("event_key", event_key);
-                        startActivity(event_page);
-                    }
-                });
-                holder.addToFavourites.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        String event_key = getRef(position).getKey();
-                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                        String userUid = user.getUid();
-                        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
-                        dbRef.child("users").child(userUid).child("favourites").child(event_key).setValue(event);
-                        Toast.makeText(getContext(), "Event added to favourites!", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    empty_view.setVisibility(View.GONE);
+                    dataAvailable = true;
+                    Log.i("--_-_---TAAABB2---_-_--", "EXISTA -------------------------------------------------------------------------- ");
+                }
+                else {
+                    recyclerView.setVisibility(View.GONE);
+                    empty_view.setVisibility(View.VISIBLE);
+                    empty_view.setText("No favourites events");
+                    dataAvailable = false;
+                    Log.i("--_-_---TAAABB2---_-_--", "NUUUUU EXISTA -------------------------------------------------------------------------- ");
+                }
             }
 
-            @NonNull
             @Override
-            public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_view_layout,parent,false);
-                return new EventViewHolder(view);
-            }
-        };
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-        /* span count = nr. de evenimente pe linie */
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(view.getContext(),1);
-        recyclerView.setLayoutManager(gridLayoutManager);
-        adapter.startListening();
-        recyclerView.setAdapter(adapter);
+            }
+        });
+        if (dataAvailable) {
+            options = new FirebaseRecyclerOptions.Builder<Event>().setQuery(databaseReference, Event.class).build();
+            adapter = new FirebaseRecyclerAdapter<Event, EventViewHolder>(options) {
+                @Override
+                protected void onBindViewHolder(@NonNull EventViewHolder holder, final int position, @NonNull Event model) {
+                    //Picasso.get().load(model.getImageUrl()).into(holder.imageViewIcon);
+                    final String eventName = model.getName();
+                    final Event event = model;
+                    Glide.with(view.getContext()).load(model.getImageUrl()).override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).into(holder.imageViewIcon);
+                    holder.textViewName.setText(model.getName());
+                    holder.textViewLocation.setText(model.getLocation());
+                    holder.imageViewIcon.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            /* retinem id key-ul evenimentului pe care dam click*/
+                            String event_key = getRef(position).getKey();
+                            /* intram in pagina evenimentului*/
+                            Intent event_page = new Intent(getActivity(), EventPage.class);
+                            event_page.putExtra("event_key", event_key);
+                            startActivity(event_page);
+                        }
+                    });
+                    holder.addToFavourites.setImageResource(R.drawable.remove_from_favourites);
+                    holder.addToFavourites.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            String event_key = getRef(position).getKey();
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            String userUid = user.getUid();
+                            DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+                            dbRef.child("users").child(userUid).child("favourites").child(event_key).setValue(null);
+                            Toast.makeText(getContext(), "Event removed from favourites!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+
+                @NonNull
+                @Override
+                public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                    View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_view_layout, parent, false);
+                    return new EventViewHolder(view);
+                }
+            };
+
+
+
+            /* span count = nr. de evenimente pe linie */
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(view.getContext(), 1);
+            recyclerView.setLayoutManager(gridLayoutManager);
+            adapter.startListening();
+            recyclerView.setAdapter(adapter);
+        }
+
 
         return view;
     }
