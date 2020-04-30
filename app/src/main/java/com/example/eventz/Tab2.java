@@ -103,14 +103,12 @@ public class Tab2 extends Fragment {
                     recyclerView.setVisibility(View.VISIBLE);
                     empty_view.setVisibility(View.GONE);
                     dataAvailable = true;
-                    Log.i("--_-_---TAAABB2---_-_--", "EXISTA -------------------------------------------------------------------------- ");
                 }
                 else {
                     recyclerView.setVisibility(View.GONE);
                     empty_view.setVisibility(View.VISIBLE);
                     empty_view.setText("No favourites events");
                     dataAvailable = false;
-                    Log.i("--_-_---TAAABB2---_-_--", "NUUUUU EXISTA -------------------------------------------------------------------------- ");
                 }
             }
 
@@ -163,8 +161,6 @@ public class Tab2 extends Fragment {
                     return new EventViewHolder(view);
                 }
             };
-
-
 
             /* span count = nr. de evenimente pe linie */
             GridLayoutManager gridLayoutManager = new GridLayoutManager(view.getContext(), 1);
