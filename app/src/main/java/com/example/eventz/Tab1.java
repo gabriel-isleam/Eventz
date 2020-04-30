@@ -61,6 +61,8 @@ public class Tab1 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        // TODO: DE ADUGAT EMPTY_VIEW IN CAZUL IN CARE NU EXISTA EVENIMENTE
+
         final View view = inflater.inflate(R.layout.fragment_tab, container, false);
         recyclerView = (RecyclerView)view.findViewById(R.id.listView);
         databaseReference = FirebaseDatabase.getInstance().getReference().child("event_list");
