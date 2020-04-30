@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="20dp"
+    android:layout_margin="10dp"
     tools:context=".EventPage">
 
     <LinearLayout
@@ -13,29 +13,28 @@
         android:orientation="vertical">
         <TextView
             android:id="@+id/eventName"
-            android:textStyle="bold"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="40dp"
-            android:fontFamily="@font/bebas">
+            android:textSize="35dp"
+            android:layout_marginBottom="10dp"
+            android:textAlignment="center"
+            android:fontFamily="@font/kiona"
+            android:gravity="center_horizontal">
         </TextView>
         <ImageView
             android:id="@+id/image_event_page"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="270dp"
             >
         </ImageView>
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textSize="20dp"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
             android:text="Descriere eveniment:"
+            android:background="@color/grey"
+            android:textColor="@color/blacky"
             android:textStyle="bold"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginRight="10dp"
-            android:fontFamily="@font/bebas"
             >
         </TextView>
 
@@ -48,70 +47,59 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/bebas"
             android:textAllCaps="false"
-            android:textSize="20dp"></TextView>
+            android:textSize="15dp"></TextView>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="20dp"
+            android:textSize="15dp"
             android:text="Locatie:"
             android:textStyle="bold"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginRight="10dp"
-            android:fontFamily="@font/bebas"
+            android:background="@color/grey"
+            android:textColor="@color/blacky"
+
             >
         </TextView>
         <TextView
             android:id="@+id/eventLocation"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="20dp"
+            android:textSize="15dp"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
-            android:fontFamily="@font/bebas">
+            android:layout_marginRight="10dp">
         </TextView>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="20dp"
-            android:text="Data si ora:"
+            android:textSize="15dp"
             android:textStyle="bold"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginRight="10dp"
-            android:fontFamily="@font/bebas"
+            android:text="Data si ora:"
+            android:background="@color/grey"
+            android:textColor="@color/blacky"
             >
         </TextView>
         <TextView
             android:id="@+id/dateEvent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="20dp"
+            android:textSize="15dp"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginEnd="30dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/bebas"
             >
         </TextView>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="20dp"
+            android:textSize="15dp"
             android:text="Available tickets:"
             android:textStyle="bold"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginRight="10dp"
-            android:fontFamily="@font/bebas"
+            android:background="@color/grey"
+            android:textColor="@color/blacky"
             >
         </TextView>
 
@@ -119,14 +107,124 @@
             android:id="@+id/tickets"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="20dp"
+            android:textSize="15dp"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginEnd="30dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/bebas"
             >
         </TextView>
+
+
+        <LinearLayout
+            android:id="@+id/linear_layout_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/black"
+            android:gravity="center_horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tv_event"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:text="Android Event Start"
+                android:textColor="@android:color/white"
+                android:textSize="20dp"
+                android:textStyle="normal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_layout_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:background="@color/blacky"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_days"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="00"
+                    android:textColor="@android:color/white"
+                    android:textSize="20dp"
+                    android:textStyle="bold"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_days_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Days"
+                    android:textColor="@android:color/white"
+                    android:textSize="20dp"
+                    android:textStyle="normal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_hour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="00"
+                    android:textColor="@android:color/white"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_hour_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Hours"
+                    android:textColor="@android:color/white"
+                    android:textSize="20dp"
+                    android:textStyle="normal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_minute"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="00"
+                    android:textColor="@android:color/white"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_minute_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Minutes"
+                    android:textColor="@android:color/white"
+                    android:textSize="20dp"
+                    android:textStyle="normal" />
+            </LinearLayout>
+        </LinearLayout>
 
     </LinearLayout>
 
