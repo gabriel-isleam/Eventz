@@ -131,7 +131,6 @@ public class UploadEvent extends AppCompatActivity {
                 public void onComplete(@NonNull Task<Uri> task) {
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
-                        System.out.println("link img=" + downloadUri);
                         String eventName = eventNameEditText.getText().toString().trim();
                         String description = eventDescriptionEditText.getText().toString().trim();
                         String date = eventDateEditText.getText().toString().trim();
@@ -151,6 +150,9 @@ public class UploadEvent extends AppCompatActivity {
                         String eventId = databaseReference.push().getKey();
                         /* adaugare eveniment nou in baza de date*/
                         databaseReference.child(eventId).setValue(eventInfo);
+                        /* adaugare eveniment in lista de evenimente a userului avand acelasi key id */
+                        databaseReference = FirebaseDatabase.getInstance().getReference("user_events");
+                        databaseReference.child(userId).child(eventId).setValue(eventInfo);
                     } else {
                         progressDialog.dismiss();
                         Toast.makeText(UploadEvent.this, "Could't load image, please try again", Toast.LENGTH_LONG).show();

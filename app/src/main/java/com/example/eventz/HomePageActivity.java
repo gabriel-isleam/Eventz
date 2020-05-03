@@ -77,6 +77,9 @@ public class HomePageActivity extends AppCompatActivity {
             case R.id.item1:
                 startActivity(new Intent(this, UploadEvent.class));
                 return true;
+            case R.id.item2:
+                startActivity(new Intent(this, UserEvents.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
