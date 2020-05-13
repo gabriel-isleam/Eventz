@@ -132,6 +132,8 @@ public class UploadEvent extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         String eventName = eventNameEditText.getText().toString().trim();
+                        String eventNameLower = new String(eventName);
+                        eventNameLower = eventNameLower.toLowerCase();
                         String description = eventDescriptionEditText.getText().toString().trim();
                         String date = eventDateEditText.getText().toString().trim();
                         String location = eventLocationEditText.getText().toString().trim();
@@ -146,7 +148,7 @@ public class UploadEvent extends AppCompatActivity {
                         progressDialog.dismiss();
                         Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
                         @SuppressWarnings("VisibleForTests")
-                        Event eventInfo = new Event(eventName, downloadUri.toString(), description, date, location, userId, tickets_no, student_price, adult_price);
+                        Event eventInfo = new Event(eventName, eventNameLower, downloadUri.toString(), description, date, location, userId, tickets_no, student_price, adult_price);
                         String eventId = databaseReference.push().getKey();
                         /* adaugare eveniment nou in baza de date*/
                         databaseReference.child(eventId).setValue(eventInfo);
