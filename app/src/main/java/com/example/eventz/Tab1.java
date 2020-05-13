@@ -56,6 +56,7 @@ public class Tab1 extends Fragment {
             addEventToDatabase(event1);
         }
         readDatabase();*/
+
     }
 
     @Override
