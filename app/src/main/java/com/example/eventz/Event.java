@@ -15,7 +15,9 @@ public class Event {
     public Event() {
 
     }
-    public Event(String name, String nameLower, String imageUrl, String description, String date, String location, String userID, String tickets_no, String student_price, String adult_price) {
+    public Event(String name, String nameLower, String imageUrl, String description, String date,
+                 String location, String userID, String tickets_no, String student_price,
+                 String adult_price) {
         this.name = name;
         this.nameLower = nameLower;
         this.imageUrl = imageUrl;
