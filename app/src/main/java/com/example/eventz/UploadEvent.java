@@ -50,7 +50,7 @@ public class UploadEvent extends AppCompatActivity {
 
     Uri FilePathUri;
     int Image_Request_Code = 7;
-    ProgressDialog progressDialog ;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,16 +61,16 @@ public class UploadEvent extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference(Database_Path);
         mFirebaseAuth = FirebaseAuth.getInstance();
 
-        ChooseButton = (Button)findViewById(R.id.ButtonChooseImage);
-        UploadButton = (Button)findViewById(R.id.ButtonUploadImage);
-        eventNameEditText = (EditText)findViewById(R.id.ImageNameEditText);
-        eventDescriptionEditText = (EditText)findViewById(R.id.DescriptionEditText);
-        eventDateEditText = (EditText)findViewById(R.id.HourEditText);
-        eventLocationEditText = (EditText)findViewById(R.id.LocationEditText);
+        ChooseButton = (Button) findViewById(R.id.ButtonChooseImage);
+        UploadButton = (Button) findViewById(R.id.ButtonUploadImage);
+        eventNameEditText = (EditText) findViewById(R.id.ImageNameEditText);
+        eventDescriptionEditText = (EditText) findViewById(R.id.DescriptionEditText);
+        eventDateEditText = (EditText) findViewById(R.id.HourEditText);
+        eventLocationEditText = (EditText) findViewById(R.id.LocationEditText);
         eventTicketsEditText = (EditText) findViewById(R.id.TicketsEditText);
-        eventAdultPriceEditText = (EditText)findViewById(R.id.AdultPriceEditText);
-        eventStudentPriceEditText = (EditText)findViewById(R.id.StudentPriceEditText);
-        SelectImage = (ImageView)findViewById(R.id.ShowImageView);
+        eventAdultPriceEditText = (EditText) findViewById(R.id.AdultPriceEditText);
+        eventStudentPriceEditText = (EditText) findViewById(R.id.StudentPriceEditText);
+        SelectImage = (ImageView) findViewById(R.id.ShowImageView);
 
         progressDialog = new ProgressDialog(UploadEvent.this);
 
@@ -85,11 +85,11 @@ public class UploadEvent extends AppCompatActivity {
             }
         });
 
-        // Adaugare Click listener pt. Upload image button.
+        // Adaugare Click listener pt. Upload event button.
         UploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UploadImageFileToFirebaseStorage();
+                UploadEventToFirebaseStorage();
             }
         });
     }
@@ -105,48 +105,84 @@ public class UploadEvent extends AppCompatActivity {
                 // incarcare imagine in ImageView.
                 SelectImage.setImageBitmap(bitmap);
                 ChooseButton.setText("Image Selected");
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public void UploadImageFileToFirebaseStorage() {
+    /*
+    * functie ce det. daca data si ora sunt introduse corect
+    */
+    public static boolean checkDateAndTime(String s) {
+        String delims = " ";
+        String[] tokens = s.split(delims);
 
-        if (FilePathUri != null) {
+        if (tokens.length != 3)
+            return false;
+
+        String date = tokens[0], hour = tokens[2];
+        String delims2 = "-", delims3 = ":";
+        String[] tokens2 = date.split(delims2);
+        String[] tokens3 = hour.split(delims3);
+
+        if (tokens2.length != 3 || tokens3.length != 2) {
+            return false;
+        }
+        for (int i = 0; i < tokens2.length; i++) {
+            boolean numeric = true;
+            numeric = tokens2[i].matches("\\d+");
+            if (!numeric || (tokens2[i].length() != 2 && i != 2) || (tokens2[i].length() != 4 && i == 2)) {
+                return false;
+            }
+        }
+        for (int i = 0; i < tokens3.length; i++) {
+            boolean numeric = true;
+            numeric = tokens3[i].matches("\\d+");
+            if (!numeric || tokens3[i].length() != 2) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public void UploadEventToFirebaseStorage() {
+        final String eventName = eventNameEditText.getText().toString().trim();
+        final String eventNameLower = eventName.toLowerCase();
+        final String description = eventDescriptionEditText.getText().toString().trim();
+        final String date = eventDateEditText.getText().toString().trim();
+        final String location = eventLocationEditText.getText().toString().trim();
+        final FirebaseUser user = mFirebaseAuth.getCurrentUser();
+        final String tickets_no = eventTicketsEditText.getText().toString().trim();
+        final String student_price = eventStudentPriceEditText.getText().toString().trim();
+        final String adult_price = eventAdultPriceEditText.getText().toString().trim();
+
+        if (eventName.isEmpty() || description.isEmpty() || date.isEmpty() || location.isEmpty() ||
+                tickets_no.isEmpty() || student_price.isEmpty() || adult_price.isEmpty() || FilePathUri == null) {
+            Toast.makeText(UploadEvent.this, "Please insert all requested data", Toast.LENGTH_LONG).show();
+        } else if (!checkDateAndTime(date)) {
+            Toast.makeText(UploadEvent.this, "Please insert date & time in the specified format",
+                    Toast.LENGTH_LONG).show();
+        } else {
             progressDialog.setTitle("Event is Uploading...");
             progressDialog.show();
             final StorageReference storageRef2 = storageReference.child(Storage_Path + FilePathUri.getLastPathSegment());
-            storageRef2.putFile(FilePathUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            storageRef2.putFile(FilePathUri).continueWithTask(new Continuation < UploadTask.TaskSnapshot, Task < Uri >> () {
                 @Override
-                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                public Task < Uri > then(@NonNull Task < UploadTask.TaskSnapshot > task) throws Exception {
                     if (!task.isSuccessful()) {
                         throw task.getException();
                     }
                     return storageRef2.getDownloadUrl();
                 }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            }).addOnCompleteListener(new OnCompleteListener < Uri > () {
                 @Override
-                public void onComplete(@NonNull Task<Uri> task) {
+                public void onComplete(@NonNull Task < Uri > task) {
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
-                        String eventName = eventNameEditText.getText().toString().trim();
-                        String eventNameLower = new String(eventName);
-                        eventNameLower = eventNameLower.toLowerCase();
-                        String description = eventDescriptionEditText.getText().toString().trim();
-                        String date = eventDateEditText.getText().toString().trim();
-                        String location = eventLocationEditText.getText().toString().trim();
-                        FirebaseUser user = mFirebaseAuth.getCurrentUser();
-                        String tickets_no = eventTicketsEditText.getText().toString().trim();
-                        String student_price = eventStudentPriceEditText.getText().toString().trim();
-                        String adult_price = eventAdultPriceEditText.getText().toString().trim();
-
                         String userId = user.getUid();
-
                         /* poza s-a uploadat => oprim progressbar-ul*/
                         progressDialog.dismiss();
-                        Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Event Uploaded Successfully ", Toast.LENGTH_LONG).show();
                         @SuppressWarnings("VisibleForTests")
                         Event eventInfo = new Event(eventName, eventNameLower, downloadUri.toString(), description, date, location, userId, tickets_no, student_price, adult_price);
                         String eventId = databaseReference.push().getKey();
@@ -155,22 +191,20 @@ public class UploadEvent extends AppCompatActivity {
                         /* adaugare eveniment in lista de evenimente a userului avand acelasi key id */
                         databaseReference = FirebaseDatabase.getInstance().getReference("user_events");
                         databaseReference.child(userId).child(eventId).setValue(eventInfo);
+
+
                     } else {
                         progressDialog.dismiss();
-                        Toast.makeText(UploadEvent.this, "Could't load image, please try again", Toast.LENGTH_LONG).show();
+                        Toast.makeText(UploadEvent.this, "Could't load event, please try again", Toast.LENGTH_LONG).show();
                     }
                 }
-            }
-            ).addOnFailureListener(new OnFailureListener() {
+            }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     progressDialog.dismiss();
                     Toast.makeText(UploadEvent.this, e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
-        }
-        else {
-            Toast.makeText(UploadEvent.this, "Please insert all requested data", Toast.LENGTH_LONG).show();
         }
     }
 }

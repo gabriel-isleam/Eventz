@@ -23,9 +23,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.Query;
 
-/*
-am folosit tutorialul asta https://www.youtube.com/watch?v=KOUyvCkwRss
-*/
 public class Tab1 extends Fragment {
 
     public RecyclerView recyclerView;
@@ -48,8 +45,6 @@ public class Tab1 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        // TODO: DE ADAUGAT EMPTY_VIEW IN CAZUL IN CARE NU EXISTA EVENIMENTE
 
         final View view = inflater.inflate(R.layout.fragment_tab, container, false);
         view2 = view;
@@ -85,13 +80,7 @@ public class Tab1 extends Fragment {
     }
 
     public void firebaseSearch(String query) {
-        // query = query.substring(0,1).toUpperCase() + query.substring(1).toLowerCase();
         Query firebaseSearchQuery = databaseReference.orderByChild("nameLower").startAt(query).endAt(query + "\uf8ff");
-
-        // TODO: DE MODIFICAT  searchQuery ul ca sa ia si cuvintele care contin literele/cuvintele introduse
-        // acum daca scrii b in loc de B mare, Bycicle Event si Beraria H n-o sa mearga pt ca e case sensitive.
-        // deci ar trebuie rezolvata si asta
-        // link cu functiile din Query https://firebase.google.com/docs/reference/android/com/google/firebase/database/Query
         options = new FirebaseRecyclerOptions.Builder<Event>().setQuery(firebaseSearchQuery, Event.class).build();
         adapter = new FirebaseRecyclerAdapter<Event, EventViewHolder>(options) {
             @Override
@@ -133,38 +122,5 @@ public class Tab1 extends Fragment {
         adapter.startListening();
         recyclerView.setAdapter(adapter);
     }
-
-    /*
-     ADAUGARE EVENIMENT IN DATABASE (varianta veche cu mai putine date, cea noua este in UploadEvent)
-    */
-   /* public void addEventToDatabase(Event newEvent) {
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("event_list");
-        //generam un key nou pt evenimentul de adaugat
-        String event_key = mDatabase.push().getKey();
-        //adaugam evenimentul
-        mDatabase.child(event_key).setValue(new Event("Event Musical", R.drawable.eveniment));
-    }*/
-
-   /* public void readDatabase() {
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("event_list");
-        mDatabase.addValueEventListener(new ValueEventListener() {
-           @Override
-           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-               ArrayList<Event> e = new ArrayList<Event>();
-               for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                   Event event= ds.getValue(Event.class);
-                   String event_idx = ds.getKey();
-                   System.out.println("event_idx = " + event_idx);
-                   System.out.println("event = " + event);
-                   e.add(event);
-               }
-               read_events = e;
-           }
-           @Override
-           public void onCancelled(@NonNull DatabaseError databaseError) {
-
-           }
-       });
-    }*/
 }
 
