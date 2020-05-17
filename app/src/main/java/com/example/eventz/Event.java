@@ -2,6 +2,7 @@ package com.example.eventz;
 
 public class Event {
     private String name;
+    private String nameLower;
     private String imageUrl;
     private String imageDescription;
     private String date;
@@ -14,8 +15,11 @@ public class Event {
     public Event() {
 
     }
-    public Event(String name, String imageUrl, String description, String date, String location, String userID, String tickets_no, String student_price, String adult_price) {
+    public Event(String name, String nameLower, String imageUrl, String description, String date,
+                 String location, String userID, String tickets_no, String student_price,
+                 String adult_price) {
         this.name = name;
+        this.nameLower = nameLower;
         this.imageUrl = imageUrl;
         this.imageDescription = description;
         this.date = date;
@@ -40,6 +44,14 @@ public class Event {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getNameLower() {
+        return nameLower;
+    }
+
+    public void setNameLower(String nameLower) {
+        this.nameLower = nameLower;
     }
 
     public String getImageDescription() {

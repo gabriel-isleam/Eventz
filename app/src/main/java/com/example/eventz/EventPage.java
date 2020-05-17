@@ -54,6 +54,8 @@ public class EventPage extends AppCompatActivity {
     ImageButton heart;
     int check = 0;
     private String eventId;
+    private String priceStudent;
+    private String priceAdult;
     Event event;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference databaseReference;
@@ -64,6 +66,8 @@ public class EventPage extends AppCompatActivity {
     private ImageView mImage;
     private TextView mLocation;
     private TextView mTickets;
+    private TextView mPriceAdult;
+    private TextView mPriceStudent;
 
 
     private String EVENT_DATE_TIME;
@@ -84,6 +88,8 @@ public class EventPage extends AppCompatActivity {
         mLocation = (TextView) findViewById(R.id.eventLocation);
         mImage = (ImageView)findViewById(R.id.image_event_page);
         mTickets = (TextView)findViewById(R.id.tickets);
+        mPriceAdult = (TextView) findViewById(R.id.priceAdult);
+        mPriceStudent = (TextView) findViewById(R.id.priceStudent);
 
         eventId = getIntent().getExtras().get("event_key").toString();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -101,6 +107,17 @@ public class EventPage extends AppCompatActivity {
                         mName.setText(event.getName());
                         mLocation.setText(event.getLocation());
                         mTickets.setText(event.getTickets_no());
+                        priceAdult = "Adults: ";
+                        priceAdult = priceAdult.concat(event.getAdult_price());
+                        priceAdult = priceAdult.concat(" lei");
+
+                        priceStudent = "Students: ";
+                        priceStudent = priceStudent.concat(event.getStudent_price());
+                        priceStudent = priceStudent.concat(" lei");
+
+                        mPriceAdult.setText(priceAdult);
+                        mPriceStudent.setText(priceStudent);
+
                         EVENT_DATE_TIME = event.getDate();
                     }
                 }

@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,17 +20,28 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -41,9 +53,12 @@ public class Tab4 extends Fragment {
     Button logoutButton; //BUTONUL DE LOGOUT
     TextView manage_profile;
     private ImageView mImageView;
-    private static final int PICK_IMAGE = 1;
+    private static final int PICK_IMAGE = 1001;
     Uri mImageUri;
     ImageButton heart;
+    DatabaseReference mDatabase;
+    StorageReference mStorageReference = FirebaseStorage.getInstance().getReference();
+
 
     private ImageView mImage;
 
@@ -56,6 +71,7 @@ public class Tab4 extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
     }
 
     @Override
@@ -64,14 +80,22 @@ public class Tab4 extends Fragment {
         final View view = inflater.inflate(R.layout.fragment_tab4, container, false);
         FirebaseUser user = mFirebaseAuth.getCurrentUser();
         System.out.println("email = " + user.getEmail());
-        mImage = (ImageView)view.findViewById(R.id.ProfileImage);
 
+        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        StorageReference mProfileRef = mStorageReference.child("usersProf/"+ userUid + ".jpg");
+        mProfileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Picasso.get().load(uri).into(mImageView);
+            }
+        });
         TextView mail_addr = (TextView) view.findViewById(R.id.adrEmail);
         mImageView = (ImageView) view.findViewById(R.id.ProfileImage);
         mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-             openGallery();
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, PICK_IMAGE);
             }
         });
 
@@ -105,19 +129,48 @@ public class Tab4 extends Fragment {
 
     }
 
-    private void openGallery() {
-        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-        startActivityForResult(gallery, PICK_IMAGE);
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
-            mImageUri = data.getData();
-            mImageView.setImageURI(mImageUri);
+        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
+            Uri FilePathUri = data.getData();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), FilePathUri);
+               //mImageView.setImageBitmap(bitmap);
+
+                upload(FilePathUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
-
     }
+
+    private void upload(Uri uri) {
+
+        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final StorageReference fileRef = mStorageReference.child("usersProf/"+ userUid + ".jpg");
+        fileRef.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                    Picasso.get().load(uri).into(mImageView);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+                //Toast.makeText(getContext(), "Image uploaded", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getContext(), "Image failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
 }

@@ -61,7 +61,7 @@
             android:layout_below="@+id/DescriptionEditText"
             android:layout_marginTop="20dp"
             android:gravity="center"
-            android:hint="Enter Event Date and Time Here" />
+            android:hint="Enter Date and Time Here: DD-MM-YYYY - 00:00" />
 
         <EditText
             android:id="@+id/LocationEditText"
@@ -78,6 +78,7 @@
             android:layout_below="@+id/LocationEditText"
             android:layout_marginTop="20dp"
             android:gravity="center"
+            android:inputType="number"
             android:hint="Enter Number of Tickets Here" />
 
         <EditText
@@ -87,6 +88,7 @@
             android:layout_below="@+id/TicketsEditText"
             android:layout_marginTop="20dp"
             android:gravity="center"
+            android:inputType="number"
             android:hint="Enter Price of Student Ticket Here" />
 
         <EditText
@@ -96,6 +98,7 @@
             android:layout_below="@+id/StudentPriceEditText"
             android:layout_marginTop="20dp"
             android:gravity="center"
+            android:inputType="number"
             android:hint="Enter Price of Adult Ticket Here" />
         <Button
             android:id="@+id/ButtonUploadImage"
