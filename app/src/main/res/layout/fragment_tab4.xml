@@ -34,6 +34,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:layout_marginTop="10dp"
+                    android:src="@drawable/avatar_bun"
                     android:background="@color/white"/>
             </RelativeLayout>
         </RelativeLayout>
