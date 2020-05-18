@@ -67,7 +67,7 @@ public class RegisterActivity extends AppCompatActivity {
                 }
                 else {
                     progressBar.setVisibility(View.VISIBLE);
-                    Log.i("REGISTER ACTIVITY", "- --------------------------------------------UID");
+//                    Log.i("REGISTER ACTIVITY", "- --------------------------------------------UID");
                     mFirebaseAuth.createUserWithEmailAndPassword(email, pwd).addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
