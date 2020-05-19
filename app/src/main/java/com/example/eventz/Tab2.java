@@ -31,7 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 public class Tab2 extends Fragment {
     private FirebaseRecyclerOptions<Event> options;
     private FirebaseRecyclerAdapter<Event, EventViewHolder> adapter;
-    boolean dataAvailable = false;
+    private boolean dataAvailable = false;
 
     private OnFragmentInteractionListener mListener;
 
