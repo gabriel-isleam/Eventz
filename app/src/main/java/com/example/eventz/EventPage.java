@@ -9,9 +9,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PersistableBundle;
+import android.text.Editable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,16 +22,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -68,6 +73,14 @@ public class EventPage extends AppCompatActivity {
     private TextView mTickets;
     private TextView mPriceAdult;
     private TextView mPriceStudent;
+    private EditText mAdultTickets;
+    private EditText mStudentTickets;
+    private Button mBuyButton;
+
+    private int adultPrice;
+    private int studentPrice;
+    private String imageUrl;
+    private String eventName;
 
 
     private String EVENT_DATE_TIME;
@@ -76,6 +89,9 @@ public class EventPage extends AppCompatActivity {
     private TextView tv_days, tv_hour, tv_minute, tv_second;
     private Handler handler = new Handler();
     private Runnable runnable;
+
+    private String emailText;
+    private String emailTo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,6 +106,8 @@ public class EventPage extends AppCompatActivity {
         mTickets = (TextView)findViewById(R.id.tickets);
         mPriceAdult = (TextView) findViewById(R.id.priceAdult);
         mPriceStudent = (TextView) findViewById(R.id.priceStudent);
+        mAdultTickets = findViewById(R.id.adult_tickes_number);
+        mStudentTickets = findViewById(R.id.student_tickes_number);
 
         eventId = getIntent().getExtras().get("event_key").toString();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -110,10 +128,12 @@ public class EventPage extends AppCompatActivity {
                         priceAdult = "Adults: ";
                         priceAdult = priceAdult.concat(event.getAdult_price());
                         priceAdult = priceAdult.concat(" lei");
+                        adultPrice = Integer.parseInt(event.getAdult_price());
 
                         priceStudent = "Students: ";
                         priceStudent = priceStudent.concat(event.getStudent_price());
                         priceStudent = priceStudent.concat(" lei");
+                        studentPrice = Integer.parseInt(event.getStudent_price());
 
                         mPriceAdult.setText(priceAdult);
                         mPriceStudent.setText(priceStudent);
@@ -125,6 +145,115 @@ public class EventPage extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+
+        mBuyButton = findViewById(R.id.buy_button);
+
+        mBuyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int adultTickets, studentTickets;
+                String adults = mAdultTickets.getText().toString();
+                if (adults.equals(""))
+                    adultTickets = 0;
+                else
+                    adultTickets = Integer.parseInt(adults);
+
+                String students = mStudentTickets.getText().toString();
+                if (students.equals(""))
+                    studentTickets = 0;
+                else
+                    studentTickets = Integer.parseInt(students);
+
+
+                int totalTickets = Integer.parseInt(mTickets.getText().toString());
+
+                if (adultTickets == 0 && studentTickets == 0) {
+                    Toast.makeText(getApplicationContext(), "You didn't choose any tickets", Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+                    if (adultTickets + studentTickets > totalTickets) {
+                        Toast.makeText(getApplicationContext(), "You have too many tickets", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    int boughtTickets = adultTickets + studentTickets;
+                    databaseReference.child(eventId).child("tickets_no").setValue(Integer.toString(totalTickets - boughtTickets));
+
+                    int total = studentTickets * studentPrice;
+                    total += adultTickets * adultPrice;
+
+                    emailTo = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                    Intent emailIntent = new Intent(Intent.ACTION_SEND);
+                    emailText = "You bought ";
+                    if (studentTickets != 0) {
+                        emailText += studentTickets + " student tickets";
+                        if (adultTickets != 0)
+                            emailText += " and " + adultTickets + " adult tickets to " + mName.getText() + "!";
+                        else
+                            emailText += " to " + mName.getText() + "!";
+                    } else {
+                        emailText += adultTickets + " adult tickets to " + mName.getText() + "!";
+                    }
+
+                    emailText += "\n\nYour total is: " + total + " lei.\n\nThank you for your purchase!\nEventz Team\n";
+
+                    new Thread() {
+                        public void run() {
+                            try {
+                                Sender sender = new Sender("eventz.team20@gmail.com", "eventzeventz");
+
+                                sender.sendMail(mName.getText() + " tickets",
+                                        emailText,
+                                        "EventzTeam",
+                                        emailTo);
+                            } catch (Exception e) {
+                                Log.e("SendMail", e.getMessage(), e);
+                            }
+                        }
+                    }.start();
+                    Toast.makeText(getApplicationContext(), "Thank you for your purchase!", Toast.LENGTH_LONG).show();
+                    String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(userUid);
+
+                    DatabaseReference eventsDB = FirebaseDatabase.getInstance().getReference().child("event_list").child(eventId);
+                    final DatabaseReference imageRef = eventsDB.child("imageUrl");
+                    DatabaseReference eventNameRef = eventsDB.child("name");
+
+                    imageRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.getValue() != null) {
+                                imageUrl = dataSnapshot.getValue().toString();
+                                databaseReference.child("tickets").child(eventId).child("imageUrl").setValue(imageUrl);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    eventNameRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.getValue() != null) {
+                                eventName = dataSnapshot.getValue().toString();
+                                databaseReference.child("tickets").child(eventId).child("name").setValue(eventName);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    databaseReference.child("tickets").child(eventId).child("adultTickets").setValue(Integer.toString(adultTickets));
+                    databaseReference.child("tickets").child(eventId).child("studentTickets").setValue(Integer.toString(studentTickets));
+                }
             }
         });
 

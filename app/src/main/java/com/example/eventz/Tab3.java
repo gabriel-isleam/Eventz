@@ -1,14 +1,34 @@
 package com.example.eventz;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.Target;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 /**
@@ -29,7 +49,13 @@ public class Tab3 extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private int currentTotal;
+
     private OnFragmentInteractionListener mListener;
+
+    private FirebaseRecyclerOptions<Ticket> options;
+    private FirebaseRecyclerAdapter<Ticket, EventViewHolderTickets> adapter;
+    private boolean dataAvailable = false;
 
     public Tab3() {
         // Required empty public constructor
@@ -66,7 +92,131 @@ public class Tab3 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_tab3, container, false);
+        final View view = inflater.inflate(R.layout.fragment_tab3, container, false);
+        final RecyclerView recyclerView = view.findViewById(R.id.listView);
+        final TextView empty_view = view.findViewById(R.id.empty_view);
+        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference ticketsDB = FirebaseDatabase.getInstance().getReference().child("users").child(userUid).child("tickets");
+        DatabaseReference eventsDB = FirebaseDatabase.getInstance().getReference().child("event_list");
+
+        ticketsDB.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    empty_view.setVisibility(View.GONE);
+                    dataAvailable = true;
+                }
+                else {
+                    recyclerView.setVisibility(View.GONE);
+                    empty_view.setVisibility(View.VISIBLE);
+                    empty_view.setText("You dont't have any tickets");
+                    dataAvailable = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        if (dataAvailable) {
+            options = new FirebaseRecyclerOptions.Builder<Ticket>().setQuery(ticketsDB, Ticket.class).build();
+            adapter = new FirebaseRecyclerAdapter<Ticket, EventViewHolderTickets>(options) {
+                @Override
+                protected void onBindViewHolder(@NonNull EventViewHolderTickets holder, final int position, @NonNull Ticket model) {
+                    //Picasso.get().load(model.getImageUrl()).into(holder.imageViewIcon);
+                    final String eventName = model.getName();
+                    final String adultTickets = model.getAdultTickets();
+                    final String studentTickets = model.getStudentTickets();
+                    final int totalTickets = Integer.parseInt(adultTickets) + Integer.parseInt(studentTickets);
+                    final Ticket event = model;
+
+                    String event_key = getRef(position).getKey();
+                    DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("event_list").child(event_key).child("tickets_no");
+
+                    dbRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.getValue() != null)
+                                currentTotal = Integer.parseInt(dataSnapshot.getValue().toString());
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    Glide.with(view.getContext()).load(model.getImageUrl()).override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).into(holder.imageViewIcon);
+                    holder.textViewName.setText(model.getName());
+                    holder.studentTickets.setText(model.getStudentTickets());
+                    holder.adultTickets.setText(model.getAdultTickets());
+                    holder.imageViewIcon.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            /* retinem id key-ul evenimentului pe care dam click*/
+                            String event_key = getRef(position).getKey();
+                            /* intram in pagina evenimentului*/
+                            Intent event_page = new Intent(getActivity(), EventPage.class);
+                            event_page.putExtra("event_key", event_key);
+                            startActivity(event_page);
+                        }
+                    });
+                    holder.cancelAttendance.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                            String event_key = "";
+                            event_key = getRef(position).getKey();
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            String userUid = user.getUid();
+                            DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+                            dbRef.child("users").child(userUid).child("tickets").child(event_key).setValue(null);
+
+                            final DatabaseReference eventsDB = FirebaseDatabase.getInstance().getReference().child("event_list").child(event_key);
+
+                            currentTotal += totalTickets;
+                            eventsDB.child("tickets_no").setValue(Integer.toString(currentTotal));
+
+                            final String emailText = "You have just cancelled your tickets for the event: " + eventName + "!\n\nEventz Team";
+                            final String emailTo = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                            new Thread() {
+                                public void run() {
+                                    try {
+                                        Sender sender = new Sender("eventz.team20@gmail.com", "eventzeventz");
+
+                                        sender.sendMail("Tickets cancellation",
+                                                emailText,
+                                                "EventzTeam",
+                                                emailTo);
+                                    } catch (Exception e) {
+                                        Log.e("SendMail", e.getMessage(), e);
+                                    }
+                                }
+                            }.start();
+
+                            Toast.makeText(getContext(), "You cancelled your tickets!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                @NonNull
+                @Override
+                public EventViewHolderTickets onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                    View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_view_layout_tickets, parent, false);
+                    return new EventViewHolderTickets(view);
+                }
+            };
+
+            /* span count = nr. de evenimente pe linie */
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(view.getContext(), 1);
+            recyclerView.setLayoutManager(gridLayoutManager);
+            adapter.startListening();
+            recyclerView.setAdapter(adapter);
+        }
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
