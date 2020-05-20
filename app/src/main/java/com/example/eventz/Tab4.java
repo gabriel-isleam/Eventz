@@ -162,7 +162,7 @@ public class Tab4 extends Fragment {
 
                     }
                 });
-                //Toast.makeText(getContext(), "Image uploaded", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Image uploaded", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
